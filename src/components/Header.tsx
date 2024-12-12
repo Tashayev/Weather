@@ -5,7 +5,7 @@ import WeatherContext from "./WeatherContext.tsx";
 
 export default function Header() {
   const {setPlaceName} = useContext(WeatherContext);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState<string>('');
   const handleSearch = () =>{
     if (inputValue.trim()){
       setPlaceName(inputValue);
