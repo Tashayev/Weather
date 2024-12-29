@@ -6,7 +6,7 @@ const WeatherContext = createContext<WeatherContextType>({
   loading: true,
   error: null,
   setPlaceName: () => {}, // Заглушка по умолчанию
-  addCity: () => {}, // Добавлена заглушка для addCity
+  addCity: () => {}, // Заглушка для addCity
 });
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
@@ -22,7 +22,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     setSavedCities(cities);
   }, []);
 
-  // Сохранение города в localStorage
+  // Сохранение города в localStorage при обновлении списка сохраненных городов
   useEffect(() => {
     if (savedCities.length > 0) {
       localStorage.setItem("savedCities", JSON.stringify(savedCities));
@@ -38,7 +38,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
         setError(null); // Сбрасываем сообщение об ошибке перед новым запросом
 
         const response = await fetch(
-            `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`
+          `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`
         );
 
         if (!response.ok) {
@@ -60,7 +60,6 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
         setError(null); // Убираем ошибку, если запрос успешен
       } catch (err) {
         setError(err.message || "Не удалось получить данные о погоде");
-        // Не очищаем weatherData, чтобы оставить существующий контент
       } finally {
         setLoading(false);
       }
@@ -71,14 +70,14 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
         await fetchWeatherData(placeName); // Используем введенное название города
       } else if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const { latitude, longitude } = position.coords;
-              await fetchWeatherData(`${latitude},${longitude}`); // Используем координаты
-            },
-            () => {
-              setError('Не удалось определить местоположение');
-              setLoading(false);
-            }
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            await fetchWeatherData(`${latitude},${longitude}`); // Используем координаты
+          },
+          () => {
+            setError('Не удалось определить местоположение');
+            setLoading(false);
+          }
         );
       } else {
         setError('Геолокация не поддерживается вашим браузером');
@@ -89,6 +88,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     getLocationAndFetchWeather();
   }, [placeName]); // Перезапуск при изменении placeName
 
+  // Добавление города в список сохраненных
   const addCity = (city: string) => {
     if (!savedCities.includes(city)) {
       const updatedCities = [...savedCities, city];
@@ -97,9 +97,9 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-      <WeatherContext.Provider value={{ weatherData, loading, error, setPlaceName, addCity }}>
-        {children}
-      </WeatherContext.Provider>
+    <WeatherContext.Provider value={{ weatherData, loading, error, setPlaceName, addCity }}>
+      {children}
+    </WeatherContext.Provider>
   );
 };
 
