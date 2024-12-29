@@ -11,7 +11,9 @@ export type WeatherContextType = {
     loading: boolean;
     error: string | null;
     setPlaceName: (place: string) => void;
-    addCity: ()=>{};
+    addCity: (city: string)=>void;
+    setPlaceName: (place: string) => void;
+
 
 };
 export type CityCardProps = {
