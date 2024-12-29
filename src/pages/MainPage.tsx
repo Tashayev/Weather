@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import WeatherContext from "../components/WeatherContext.tsx";
-import WeatherInfo from "../components/WeatherInfo.tsx";
-import WeatherIcon from "../components/WeatherIcon.tsx";
 import SavedCities from "../components/SavedCities.tsx";
 import {
   rainy,
