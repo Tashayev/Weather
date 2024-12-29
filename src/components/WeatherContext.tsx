@@ -15,63 +15,52 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
   const [placeName, setPlaceName] = useState<string | null>(null);
 
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_WEATHER_KEY || 'default_value_if_key_is_missing';
+  const apiKey = import.meta.env.VITE_WEATHER_KEY || 'default_value_if_key_is_missing';
 
-    const fetchWeatherData = async (query: string) => {
-      try {
-        setLoading(true);
-        setError(null); // Сбрасываем сообщение об ошибке перед новым запросом
+  const fetchWeatherData = async (query: string) => {
+    try {
+      const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`);
+      const data = await response.json();
 
-        const response = await fetch(
-            `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`
-        );
-
-        if (!response.ok) {
-          throw new Error("City not found");
-        }
-
-        const data = await response.json();
-
-        if (!data || !data.location || !data.current) {
-          throw new Error("Invalid data received from API");
-        }
-
-        setWeatherData({
-          weatherIn: data.location.name,
-          temperature: data.current.temp_c + " °C",
-          condition: data.current.condition.text,
-          localTime: data.location.localtime,
-        });
-        setError(null); // Убираем ошибку, если запрос успешен
-      } catch (err) {
-        setError(err.message || "Не удалось получить данные о погоде");
-        // Не очищаем weatherData, чтобы оставить существующий контент
-      } finally {
-        setLoading(false);
-      }
-    };
-    const getLocationAndFetchWeather = async () => {
-      if (placeName) {
-        await fetchWeatherData(placeName); // Используем введенное название города
-      } else if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            await fetchWeatherData(`${latitude},${longitude}`); // Используем координаты
-          },
-          () => {
-            setError('Не удалось определить местоположение');
-            setLoading(false);
-          }
-        );
+      setWeatherData({
+        weatherIn: data.location.name,
+        temperature: data.current.temp_c + ' °C',
+        condition: data.current.condition.text,
+        localTime: data.location.localtime,
+      });
+      setError(null);
+    } catch (err: unknown) { // Добавляем тип unknown для err
+      if (err instanceof Error) { // Проверяем, является ли err объектом типа Error
+        setError(err.message); // Используем err.message для отображения ошибки
       } else {
-        setError('Геолокация не поддерживается вашим браузером');
-        setLoading(false);
+        setError('Не удалось получить данные о погоде');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    getLocationAndFetchWeather();
-  }, [placeName]);
+  const getLocationAndFetchWeather = async () => {
+    if (placeName) {
+      await fetchWeatherData(placeName); // Используем введенное название города
+    } else if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        await fetchWeatherData(`${latitude},${longitude}`); // Используем координаты
+      }, () => {
+        setError('Не удалось определить местоположение');
+        setLoading(false);
+      });
+    } else {
+      setError('Геолокация не поддерживается вашим браузером');
+      setLoading(false);
+    }
+  };
+
+  getLocationAndFetchWeather();
+}, [placeName]); // Перезапуск при изменении placeName
+
 
   return (
     <WeatherContext.Provider value={{ weatherData, loading, error, setPlaceName }}>
