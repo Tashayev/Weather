@@ -5,7 +5,7 @@ const WeatherContext = createContext<WeatherContextType>({
   weatherData: null,
   loading: true,
   error: null,
-  setPlaceName: () => {}, // Заглушка по умолчанию
+  setPlaceName: () => {} // Заглушка по умолчанию
 });
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
@@ -19,24 +19,37 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
 
     const fetchWeatherData = async (query: string) => {
       try {
-        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`);
-        if (!response.ok) throw new Error("Error fetching weather data");
+        setLoading(true);
+        setError(null); // Сбрасываем сообщение об ошибке перед новым запросом
+
+        const response = await fetch(
+            `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`
+        );
+
+        if (!response.ok) {
+          throw new Error("City not found");
+        }
+
         const data = await response.json();
+
+        if (!data || !data.location || !data.current) {
+          throw new Error("Invalid data received from API");
+        }
 
         setWeatherData({
           weatherIn: data.location.name,
-          temperature: `${data.current.temp_c} °C`,
+          temperature: data.current.temp_c + " °C",
           condition: data.current.condition.text,
           localTime: data.location.localtime,
         });
-        setError(null);
+        setError(null); // Убираем ошибку, если запрос успешен
       } catch (err) {
-        setError('Не удалось получить данные о погоде');
+        setError(err.message || "Не удалось получить данные о погоде");
+        // Не очищаем weatherData, чтобы оставить существующий контент
       } finally {
         setLoading(false);
       }
     };
-
     const getLocationAndFetchWeather = async () => {
       if (placeName) {
         await fetchWeatherData(placeName); // Используем введенное название города
