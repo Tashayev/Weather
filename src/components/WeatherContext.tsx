@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, ReactNode, React } from 'react';
+import { createContext, useState, useEffect, ReactNode } from 'react';
 import { WeatherData, WeatherContextType } from "../interfaces.tsx";
 
 const WeatherContext = createContext<WeatherContextType>({
