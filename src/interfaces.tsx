@@ -12,3 +12,8 @@ export type WeatherContextType = {
     error: string | null;
     setPlaceName: () => {};
 };
+export type CityCardProps = {
+  cityName: string;
+  onRemove: (cityName: string) => void;
+  temperture: string | null;
+};

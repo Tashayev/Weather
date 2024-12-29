@@ -1,5 +1,8 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import WeatherContext from "../components/WeatherContext.tsx";
+import WeatherInfo from "../components/WeatherInfo.tsx";
+import WeatherIcon from "../components/WeatherIcon.tsx";
+import SavedCities from "../components/SavedCities.tsx";
 import {
   rainy,
   snow,
@@ -30,59 +33,76 @@ const getWeatherIcon = (condition: string): string =>
     Object.entries(weatherIcon).find(([key]) =>
         condition.toLowerCase().includes(key.toLowerCase())
     )?.[1] || defaultIcon;
-
 const MainPage = () => {
   const { weatherData, loading, error } = useContext(WeatherContext);
+  const [savedCities, setSavedCities] = useState<string[]>([]);
+  const [cityTemperatures, setCityTemperatures] = useState<Record<string, string | null>>({});
+  const [cityConditions, setCityConditions] = useState<Record<string, string>>({});
+  const [cityLocalTimes, setCityLocalTimes] = useState<Record<string, string | null>>({});
+  const [cityIcons, setCityIcons] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const cities = JSON.parse(localStorage.getItem("savedCities") || "[]");
+    setSavedCities(cities);
+  }, []);
+
+  useEffect(() => {
+    if (weatherData?.weatherIn) {
+      const city = weatherData.weatherIn;
+      if (!savedCities.includes(city)) {
+        const updatedCities = [...savedCities, city];
+        setSavedCities(updatedCities);
+        localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+      }
+
+      // Обновляем данные о погоде для города
+      setCityTemperatures((prev) => ({ ...prev, [city]: weatherData.temperature }));
+      setCityConditions((prev) => ({ ...prev, [city]: weatherData.condition }));
+      setCityLocalTimes((prev) => ({ ...prev, [city]: weatherData.localTime }));
+      setCityIcons((prev) => ({ ...prev, [city]: getWeatherIcon(weatherData.condition) }));
+    }
+  }, [weatherData]);
+
+  const removeCity = (cityName: string) => {
+    const updatedCities = savedCities.filter((city) => city !== cityName);
+    setSavedCities(updatedCities);
+    localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+
+    // Удаляем данные о городе
+    setCityTemperatures((prev) => {
+      const { [cityName]: _, ...rest } = prev;
+      return rest;
+    });
+    setCityConditions((prev) => {
+      const { [cityName]: _, ...rest } = prev;
+      return rest;
+    });
+    setCityLocalTimes((prev) => {
+      const { [cityName]: _, ...rest } = prev;
+      return rest;
+    });
+    setCityIcons((prev) => {
+      const { [cityName]: _, ...rest } = prev;
+      return rest;
+    });
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
-  const { weatherIn, condition = "", temperature, localTime } = weatherData || {};
-  const icon = getWeatherIcon(condition);
-
   return (
-      <div className="flex justify-center items-start gap-10 h-full pt-20">
-        <WeatherInfo
-            weatherIn={weatherIn}
-            temperature={temperature}
-            condition={condition}
-            localTime={localTime}
+      <div className="flex flex-col items-center gap-10 h-full pt-10">
+
+        <SavedCities
+            savedCities={savedCities}
+            cityTemperatures={cityTemperatures}
+            cityConditions={cityConditions}
+            cityLocalTimes={cityLocalTimes}
+            cityIcons={cityIcons}
+            onRemove={removeCity}
         />
-        <WeatherIcon icon={icon} />
       </div>
   );
 };
-
-const WeatherInfo = ({
-                       weatherIn,
-                       temperature,
-                       condition,
-                       localTime,
-                     }: {
-  weatherIn: string;
-  temperature: string | null;
-  condition: string;
-  localTime: string;
-}) => {
-  // Разделяем дату и время
-  const [date, time] = localTime ? localTime.split(" ") : ["No data", "No data"];
-  const formattedTemp = temperature ? `${parseInt(temperature)>0 ? "+" : ""}${parseInt(temperature)}`   : "No data";
-
-  return (
-      <div>
-        <h2 className="text-xl font-bold">Weather in {weatherIn}</h2>
-        <p className="text-lg">Temperature: {formattedTemp}</p>
-        <p className="text-lg">Condition: {condition}</p>
-        <p className="text-lg">Date: {date}</p>
-        <p className="text-lg">Time: {time}</p>
-      </div>
-  );
-};
-
-const WeatherIcon = ({ icon }: { icon: string }) => (
-    <div>
-      <img alt="weather icon" src={icon} className="w-16 h-16 mt-4" />
-    </div>
-);
 
 export default MainPage;

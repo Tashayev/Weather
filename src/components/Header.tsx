@@ -1,19 +1,33 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import {faUmbrella} from "@fortawesome/free-solid-svg-icons/faUmbrella";
 import {useContext, useState} from "react";
 import WeatherContext from "./WeatherContext.tsx";
 
 export default function Header() {
   const {setPlaceName} = useContext(WeatherContext);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState<string>('');
   const handleSearch = () =>{
     if (inputValue.trim()){
       setPlaceName(inputValue);
+      saveCityToLocalStorage(inputValue.trim());
     };
   };
+  const saveCityToLocalStorage = (city: string) =>{
+    const savedCities = JSON.parse(localStorage.getItem('savedCities')||'[]');
+    if(!savedCities.includes(city)){
+      savedCities.push(city);
+      localStorage.setItem('savedCities', JSON.stringify(savedCities));
+    }
+  };
+  
   return (
       <div className="sticky h-14 bg-blue-500 w-full flex items-center justify-around">
-        <h2 className="uppercase text-white font-bold">weather check</h2>
+        <div className="flex items-center gap-1">
+          <FontAwesomeIcon icon={faUmbrella} className="text-white"/>
+          <h2 className="uppercase text-white font-bold hidden sm:block">weather check</h2>
+        </div>
+
         <div className="relative my-20">
           <input
               type="text"
