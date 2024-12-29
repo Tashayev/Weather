@@ -10,8 +10,8 @@ export type WeatherContextType = {
     weatherData: WeatherData | null;
     loading: boolean;
     error: string | null;
-
-  setPlaceName: (place: string) => void;
+    setPlaceName: (place: string) => void;
+    addCity: ()=>{};
 
 };
 export type CityCardProps = {

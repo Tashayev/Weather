@@ -6,7 +6,7 @@ const WeatherContext = createContext<WeatherContextType>({
   loading: true,
   error: null,
   setPlaceName: () => {}, // Заглушка по умолчанию
-  addCity: () => {}, // Добавлена заглушка для addCity
+  addCity: () => {}, // Заглушка для addCity
 });
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
@@ -22,7 +22,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     setSavedCities(cities);
   }, []);
 
-  // Сохранение города в localStorage
+  // Сохранение города в localStorage при обновлении списка сохраненных городов
   useEffect(() => {
     if (savedCities.length > 0) {
       localStorage.setItem("savedCities", JSON.stringify(savedCities));
@@ -58,9 +58,12 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
           localTime: data.location.localtime,
         });
         setError(null); // Убираем ошибку, если запрос успешен
-      } catch (err) {
-        setError(err.message || "Не удалось получить данные о погоде");
-        // Не очищаем weatherData, чтобы оставить существующий контент
+      } catch (err: unknown) { // Явное указание типа err как unknown
+        if (err instanceof Error) {
+          setError(err.message || "Не удалось получить данные о погоде"); // Обработка ошибки как экземпляра Error
+        } else {
+          setError("Неизвестная ошибка");
+        }
       } finally {
         setLoading(false);
       }
@@ -89,6 +92,8 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     getLocationAndFetchWeather();
   }, [placeName]); // Перезапуск при изменении placeName
 
+
+  // Добавление города в список сохраненных
   const addCity = (city: string) => {
     if (!savedCities.includes(city)) {
       const updatedCities = [...savedCities, city];
