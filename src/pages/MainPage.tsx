@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import WeatherContext from "../components/WeatherContext.tsx";
-import WeatherInfo from "../components/WeatherInfo.tsx";
-import WeatherIcon from "../components/WeatherIcon.tsx";
 import SavedCities from "../components/SavedCities.tsx";
 import {
   rainy,
@@ -33,8 +31,9 @@ const getWeatherIcon = (condition: string): string =>
     Object.entries(weatherIcon).find(([key]) =>
         condition.toLowerCase().includes(key.toLowerCase())
     )?.[1] || defaultIcon;
+
 const MainPage = () => {
-  const { weatherData, loading, error } = useContext(WeatherContext);
+  const { weatherData, loading, error, addCity } = useContext(WeatherContext);
   const [savedCities, setSavedCities] = useState<string[]>([]);
   const [cityTemperatures, setCityTemperatures] = useState<Record<string, string | null>>({});
   const [cityConditions, setCityConditions] = useState<Record<string, string>>({});
@@ -50,9 +49,8 @@ const MainPage = () => {
     if (weatherData?.weatherIn) {
       const city = weatherData.weatherIn;
       if (!savedCities.includes(city)) {
-        const updatedCities = [...savedCities, city];
-        setSavedCities(updatedCities);
-        localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+        addCity(city); // Добавляем город через функцию addCity из контекста
+        setSavedCities((prevCities) => [...prevCities, city]); // Обновляем savedCities здесь
       }
 
       // Обновляем данные о погоде для города
@@ -88,19 +86,24 @@ const MainPage = () => {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
 
   return (
       <div className="flex flex-col items-center gap-10 h-full pt-10">
+        {savedCities.length > 0 ? (
+            <SavedCities
+                savedCities={savedCities}
+                cityTemperatures={cityTemperatures}
+                cityConditions={cityConditions}
+                cityLocalTimes={cityLocalTimes}
+                cityIcons={cityIcons}
+                onRemove={removeCity}
+            />
+        ) : (
+            <p>Please enter your city and click FIND</p>
+        )}
 
-        <SavedCities
-            savedCities={savedCities}
-            cityTemperatures={cityTemperatures}
-            cityConditions={cityConditions}
-            cityLocalTimes={cityLocalTimes}
-            cityIcons={cityIcons}
-            onRemove={removeCity}
-        />
+        {/* Ошибка всегда отображается внизу */}
+        {error && <p className="text-red-500 mt-4">City not found</p>}
       </div>
   );
 };

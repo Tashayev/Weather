@@ -1,4 +1,4 @@
-import React from "react";
+
 import CityCard from "./CityCard";
 
 const SavedCities = ({
