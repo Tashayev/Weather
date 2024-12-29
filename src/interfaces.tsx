@@ -10,7 +10,7 @@ export type WeatherContextType = {
     weatherData: WeatherData | null;
     loading: boolean;
     error: string | null;
-    addCity: ()=>{};
+    addCity: (city: string)=>{};
     setPlaceName: (place: string) => void;
 
 };
