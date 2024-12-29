@@ -6,6 +6,7 @@ const WeatherContext = createContext<WeatherContextType>({
   loading: true,
   error: null,
   setPlaceName: () => {}, // Заглушка по умолчанию
+  addCity: () => {}, // Добавлена заглушка для addCity
 });
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
@@ -86,7 +87,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     };
 
     getLocationAndFetchWeather();
-  }, [placeName]);
+  }, [placeName]); // Перезапуск при изменении placeName
 
   const addCity = (city: string) => {
     if (!savedCities.includes(city)) {
