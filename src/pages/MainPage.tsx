@@ -31,6 +31,7 @@ const getWeatherIcon = (condition: string): string =>
     Object.entries(weatherIcon).find(([key]) =>
         condition.toLowerCase().includes(key.toLowerCase())
     )?.[1] || defaultIcon;
+
 const MainPage = () => {
   const { weatherData, loading, error } = useContext(WeatherContext);
   const [savedCities, setSavedCities] = useState<string[]>([]);
@@ -86,19 +87,24 @@ const MainPage = () => {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
 
   return (
       <div className="flex flex-col items-center gap-10 h-full pt-10">
+        {savedCities.length > 0 ? (
+            <SavedCities
+                savedCities={savedCities}
+                cityTemperatures={cityTemperatures}
+                cityConditions={cityConditions}
+                cityLocalTimes={cityLocalTimes}
+                cityIcons={cityIcons}
+                onRemove={removeCity}
+            />
+        ) : (
+            <p>Please enter your city and click FIND</p>
+        )}
 
-        <SavedCities
-            savedCities={savedCities}
-            cityTemperatures={cityTemperatures}
-            cityConditions={cityConditions}
-            cityLocalTimes={cityLocalTimes}
-            cityIcons={cityIcons}
-            onRemove={removeCity}
-        />
+        {/* Ошибка всегда отображается внизу */}
+        {error && <p className="text-red-500 mt-4">City not found</p>}
       </div>
   );
 };
