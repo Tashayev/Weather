@@ -10,24 +10,12 @@ const WeatherContext = createContext<WeatherContextType>({
 });
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
+
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [placeName, setPlaceName] = useState<string | null>(null);
   const [savedCities, setSavedCities] = useState<string[]>([]);
-
-  // Загрузка сохраненных городов при загрузке компонента
-  useEffect(() => {
-    const cities = JSON.parse(localStorage.getItem("savedCities") || "[]");
-    setSavedCities(cities);
-  }, []);
-
-  // Сохранение города в localStorage при обновлении списка сохраненных городов
-  useEffect(() => {
-    if (savedCities.length > 0) {
-      localStorage.setItem("savedCities", JSON.stringify(savedCities));
-    }
-  }, [savedCities]);
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_WEATHER_KEY || 'default_value_if_key_is_missing';
@@ -92,6 +80,18 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     getLocationAndFetchWeather();
   }, [placeName]); // Перезапуск при изменении placeName
 
+// Загрузка сохраненных городов при загрузке компонента
+  useEffect(() => {
+    const cities = JSON.parse(localStorage.getItem("savedCities") || "[]");
+    setSavedCities(cities);
+  }, []);
+
+  // Сохранение города в localStorage при обновлении списка сохраненных городов
+  useEffect(() => {
+    if (savedCities.length > 0) {
+      localStorage.setItem("savedCities", JSON.stringify(savedCities));
+    }
+  }, [savedCities]);
 
   // Добавление города в список сохраненных
   const addCity = (city: string) => {

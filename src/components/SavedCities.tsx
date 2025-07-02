@@ -1,4 +1,3 @@
-
 import CityCard from "./CityCard";
 
 const SavedCities = ({
