@@ -5,7 +5,7 @@ import {WeatherProvider} from "./components/WeatherContext.tsx";
 function App() {
 
   return (
-      <WeatherProvider>
+      <WeatherProvider >
          <Header/>
          <MainPage/>
       </WeatherProvider>

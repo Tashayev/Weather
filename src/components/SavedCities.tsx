@@ -16,7 +16,7 @@ const SavedCities = ({
   onRemove: (cityName: string) => void;
 }) => {
   return (
-      <div className="flex flex-wrap gap-4 justify-center">
+      <div className="flex gap-4 justify-center md:flex-row flex-col  p-4 ">
         {savedCities.map((city) => (
             <CityCard
                 key={city}

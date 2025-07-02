@@ -88,7 +88,7 @@ const MainPage = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-      <div className="flex flex-col items-center gap-10 h-full pt-10">
+      <div className="flex flex-col items-center gap-10 min-h-screen pt-20 bg-[#f0f4f8]">
         {savedCities.length > 0 ? (
             <SavedCities
                 savedCities={savedCities}

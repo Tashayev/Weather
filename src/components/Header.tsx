@@ -16,7 +16,7 @@ export default function Header() {
   };
 
   return (
-      <div className="sticky h-14 bg-blue-500 w-full flex items-center justify-around">
+      <div className="fixed h-14 bg-blue-500 w-full flex items-center justify-around">
         <div className="flex items-center gap-1">
           <FontAwesomeIcon icon={faUmbrella} className="text-white" />
           <h2 className="uppercase text-white font-bold hidden sm:block">weather check</h2>
@@ -26,7 +26,7 @@ export default function Header() {
         <form onSubmit={handleSearch} className="relative my-20 flex items-center">
           <input
               type="text"
-              className="pl-10 py-1 pr-4 h-full border border-gray-300 rounded-md outline-none"
+              className="pl-10 py-2 pr-4 h-full border border-solid border-gray-300 rounded-lg outline-none text-base w-full max-w-[18.75rem] "
               placeholder="Search"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
