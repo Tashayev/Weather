@@ -13,6 +13,7 @@ import {
   overcast,
 } from "../assets/icons";
 
+
 const weatherIcon: Record<string, string> = {
   Rain: rainy,
   Snow: snow,
@@ -88,7 +89,8 @@ const MainPage = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-      <div className="flex flex-col items-center gap-10 min-h-screen pt-20 bg-[#f0f4f8]">
+      <div className="flex flex-col items-center gap-10 min-h-screen pt-20 bg-[#f0f4f8] dark:bg-gray-800">
+
         {savedCities.length > 0 ? (
             <SavedCities
                 savedCities={savedCities}
